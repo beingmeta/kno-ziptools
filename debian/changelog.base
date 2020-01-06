@@ -1,0 +1,5 @@
+kno-ziptools (1910.0) stable; urgency=medium
+
+  * Initial create of separate dpkg for kno-ziptools
+
+ -- Ken Haase <kh@beingmeta.com>  Mon, 6 Jan 2019 17:07:13 +0000
