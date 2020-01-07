@@ -22,7 +22,7 @@ MOD_NAME	::= ziptools
 MOD_RELEASE     ::= $(shell cat etc/release)
 MOD_VERSION	::= ${KNO_MAJOR}.${KNO_MINOR}.${MOD_RELEASE}
 GPGID           ::= FE1BC737F9F323D732AA26330620266BE5AFF294
-SUDO            ::= ${SUDO:-$(shell which sudo)}
+SUDO            ::= $(shell which sudo)
 
 default: staticlibs
 	make ziptools.${libsuffix}
