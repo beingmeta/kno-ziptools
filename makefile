@@ -27,6 +27,8 @@ SUDO            ::= ${SUDO:-$(shell which sudo)}
 default: staticlibs
 	make ziptools.${libsuffix}
 
+STATICLIBS=installed/lib/libzip.a
+
 libzip/.git:
 	git submodule init
 	git submodule update
@@ -35,9 +37,9 @@ libzip/cmake-build/Makefile: libzip/.git
 	cd libzip/cmake-build && \
 	cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
 	      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+	      -DBUILD_SHARED_LIBS=off \
 	      -DCMAKE_INSTALL_PREFIX=../../installed \
 	      ..
-STATICLIBS=installed/lib/libbson-static-1.0.a installed/lib/libmongoc-static-1.0.a
 
 ziptools.o: ziptools.c makefile ${STATICLIBS}
 	@$(CC) $(CFLAGS) -o $@ -c $<
@@ -46,7 +48,7 @@ ziptools.so: ziptools.o makefile
 	 $(MKSO) -o $@ ziptools.o -Wl,-soname=$(@F).${MOD_VERSION} \
 	          -Wl,--allow-multiple-definition \
 	          -Wl,--whole-archive ${STATICLIBS} -Wl,--no-whole-archive \
-		 $(LDFLAGS)
+		 $(LDFLAGS) ${STATICLIBS}
 	 @$(MSG) MKSO "(ZIPTOOLS)" $@
 
 ziptools.dylib: ziptools.o
@@ -72,7 +74,7 @@ install:
 
 clean:
 	rm -f *.o *.${libsuffix}
-deep-clean: clean
+deepclean deep-clean: clean
 	if test -f libzip/Makefile; then cd ziptools; make clean; fi;
 	rm -rf libzip/cmake-build installed
 
@@ -94,9 +96,12 @@ debian.updated: debian.signed
 
 update-apt: debian.updated
 
+debinstall: debian.signed
+	${SUDO} dpkg -i ../kno-ziptools*.deb
+
 debclean:
 	rm -f ../kno-ziptools_* ../kno-ziptools-* debian/changelog
 
 debfresh:
 	make debclean
-	make debian.built
+	make debian.signed
