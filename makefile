@@ -21,8 +21,9 @@ SYSINSTALL      ::= /usr/bin/install -c
 MOD_NAME	::= ziptools
 MOD_RELEASE     ::= $(shell cat etc/release)
 MOD_VERSION	::= ${KNO_MAJOR}.${KNO_MINOR}.${MOD_RELEASE}
-GPGID           ::= FE1BC737F9F323D732AA26330620266BE5AFF294
-SUDO            ::= $(shell which sudo)
+
+GPGID = FE1BC737F9F323D732AA26330620266BE5AFF294
+SUDO  = $(shell which sudo)
 
 default: staticlibs
 	make ziptools.${libsuffix}
@@ -86,26 +87,28 @@ debian: ziptools.c makefile \
 
 debian/changelog: debian ziptools.c makefile
 	@cat debian/changelog.base | etc/gitchangelog kno-ziptools > $@.tmp
-	@if diff debian/changelog debian/changelog.tmp 2>&1 > /dev/null; then \
+	@if test ! -f debian/changelog; then \
+	  mv debian/changelog.tmp debian/changelog; \
+	 elif diff debian/changelog debian/changelog.tmp 2>&1 > /dev/null; then \
 	  mv debian/changelog.tmp debian/changelog; \
 	else rm debian/changelog.tmp; fi
 
-debian.built: ziptools.c makefile debian/changelog
+dist/debian.built: ziptools.c makefile debian/changelog
 	dpkg-buildpackage -sa -us -uc -b -rfakeroot && \
 	touch $@
 
-debian.signed: debian.built
+dist/debian.signed: dist/debian.built
 	debsign --re-sign -k${GPGID} ../kno-ziptools_*.changes && \
 	touch $@
 
-dpkg dpkgs: debian.signed
-
-debian.updated: debian.signed
+dist/debian.updated: dist/debian.signed
 	dupload -c ./debian/dupload.conf --nomail --to bionic ../kno-ziptools_*.changes && touch $@
 
-update-apt: debian.updated
+deb debs dpkg dpkgs: dist/debian.signed
 
-debinstall: debian.signed
+update-apt: dist/debian.updated
+
+debinstall: dist/debian.signed
 	${SUDO} dpkg -i ../kno-ziptools*.deb
 
 debclean:
@@ -113,4 +116,4 @@ debclean:
 
 debfresh:
 	make debclean
-	make debian.signed
+	make dist/debian.signed
