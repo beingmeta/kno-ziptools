@@ -113,7 +113,7 @@ debinstall: dist/debian.signed
 	${SUDO} dpkg -i ../kno-ziptools*.deb
 
 debclean:
-	rm -rf ../kno-ziptools_* ../kno-ziptools-* debian
+	rm -rf ../kno-ziptools_* ../kno-ziptools-* debian dist/debian.*
 
 debfresh:
 	make debclean
