@@ -78,12 +78,17 @@ deepclean deep-clean: clean
 	if test -f libzip/Makefile; then cd ziptools; make clean; fi;
 	rm -rf libzip/cmake-build installed
 
-debian/changelog: ziptools.c makefile \
-		  debian/rules debian/control \
-		  debian/changelog.base
+debian: ziptools.c makefile \
+	dist/debian/rules dist/debian/control \
+	dist/debian/changelog.base
+	rm -rf debian
+	cp -r dist/debian debian
+	cat debian/changelog.base | etc/gitchangelog kno-ziptools > debian/changelog
+
+debian/changelog: debian ziptools.c makefile
 	cat debian/changelog.base | etc/gitchangelog kno-ziptools > $@
 
-debian.built: debian/changelog ${STATICLIBS}
+debian.built: ziptools.c makefile debian debian/changelog
 	dpkg-buildpackage -sa -us -uc -b -rfakeroot && \
 	touch $@
 
