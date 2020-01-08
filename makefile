@@ -83,14 +83,12 @@ debian: ziptools.c makefile \
 	dist/debian/changelog.base
 	rm -rf debian
 	cp -r dist/debian debian
-	cat debian/changelog.base | etc/gitchangelog kno-ziptools > debian/changelog
 
 debian/changelog: debian ziptools.c makefile
-	cat debian/changelog.base | etc/gitchangelog kno-ziptools > $@.tmp
-	if diff debian/changelog debian/changelog.tmp 2>&1 > /dev/null; then \
+	@cat debian/changelog.base | etc/gitchangelog kno-ziptools > $@.tmp
+	@if diff debian/changelog debian/changelog.tmp 2>&1 > /dev/null; then \
 	  mv debian/changelog.tmp debian/changelog; \
-	else rm debian/changelog.tmp; \
-	fi
+	else rm debian/changelog.tmp; fi
 
 debian.built: ziptools.c makefile debian/changelog
 	dpkg-buildpackage -sa -us -uc -b -rfakeroot && \
@@ -99,6 +97,8 @@ debian.built: ziptools.c makefile debian/changelog
 debian.signed: debian.built
 	debsign --re-sign -k${GPGID} ../kno-ziptools_*.changes && \
 	touch $@
+
+dpkg dpkgs: debian.signed
 
 debian.updated: debian.signed
 	dupload -c ./debian/dupload.conf --nomail --to bionic ../kno-ziptools_*.changes && touch $@
