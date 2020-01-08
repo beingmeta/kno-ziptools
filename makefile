@@ -112,7 +112,7 @@ update-apt: dist/debian.updated
 debinstall: dist/debian.signed
 	${SUDO} dpkg -i ../kno-ziptools*.deb
 
-debclean:
+debclean: clean
 	rm -rf ../kno-ziptools_* ../kno-ziptools-* debian dist/debian.*
 
 debfresh:
