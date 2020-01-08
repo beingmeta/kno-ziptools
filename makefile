@@ -86,9 +86,13 @@ debian: ziptools.c makefile \
 	cat debian/changelog.base | etc/gitchangelog kno-ziptools > debian/changelog
 
 debian/changelog: debian ziptools.c makefile
-	cat debian/changelog.base | etc/gitchangelog kno-ziptools > $@
+	cat debian/changelog.base | etc/gitchangelog kno-ziptools > $@.tmp
+	if diff debian/changelog debian/changelog.tmp 2>&1 > /dev/null; then \
+	  mv debian/changelog.tmp debian/changelog; \
+	else rm debian/changelog.tmp; \
+	fi
 
-debian.built: ziptools.c makefile debian debian/changelog
+debian.built: ziptools.c makefile debian/changelog
 	dpkg-buildpackage -sa -us -uc -b -rfakeroot && \
 	touch $@
 
