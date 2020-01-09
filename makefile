@@ -2,8 +2,8 @@ prefix		::= $(shell knoconfig prefix)
 libsuffix	::= $(shell knoconfig libsuffix)
 KNO_CFLAGS	::= -I. -fPIC $(shell knoconfig cflags)
 KNO_LDFLAGS	::= -fPIC $(shell knoconfig ldflags)
-LIBZIP_CFLAGS   ::=
-LIBZIP_LDFLAGS  ::=
+LIBZIP_CFLAGS   ::= -Iinstalled/include
+LIBZIP_LDFLAGS  ::= 
 CFLAGS		::= ${CFLAGS} ${KNO_CFLAGS} ${BSON_CFLAGS} ${LIBZIP_CFLAGS}
 LDFLAGS		::= ${LDFLAGS} ${KNO_LDFLAGS} ${BSON_LDFLAGS} ${LIBZIP_LDFLAGS}
 CMODULES	::= $(DESTDIR)$(shell knoconfig cmodules)
@@ -61,6 +61,13 @@ ziptools.dylib: ziptools.o
 
 ${STATICLIBS}: libzip/cmake-build/Makefile
 	make -C libzip/cmake-build install
+	if test -d installed/lib; then \
+	  echo > /dev/null; \
+	elif test -d installed/lib64; then \
+	  ln -sf lib64 installed/lib; \
+	else echo "No install libdir"; \
+	fi
+
 staticlibs: ${STATICLIBS}
 
 install:
