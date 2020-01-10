@@ -1,11 +1,11 @@
 prefix		::= $(shell knoconfig prefix)
 libsuffix	::= $(shell knoconfig libsuffix)
 KNO_CFLAGS	::= -I. -fPIC $(shell knoconfig cflags)
-KNO_LDFLAGS	::= -fPIC $(shell knoconfig ldflags)
+KNO_LDFLAGS	::= -fPIC $(shell knoconfig ldflags) $(shell knoconfig libs)
 LIBZIP_CFLAGS   ::= -Iinstalled/include
-LIBZIP_LDFLAGS  ::= 
-CFLAGS		::= ${CFLAGS} ${KNO_CFLAGS} ${BSON_CFLAGS} ${LIBZIP_CFLAGS}
-LDFLAGS		::= ${LDFLAGS} ${KNO_LDFLAGS} ${BSON_LDFLAGS} ${LIBZIP_LDFLAGS}
+LIBZIP_LDFLAGS  ::= -lz -lbz2 -llzma
+CFLAGS		::= ${CFLAGS} ${KNO_CFLAGS} ${LIBZIP_CFLAGS}
+LDFLAGS		::= ${LDFLAGS} ${KNO_LDFLAGS} ${LIBZIP_LDFLAGS}
 CMODULES	::= $(DESTDIR)$(shell knoconfig cmodules)
 LIBS		::= $(shell knoconfig libs)
 LIB		::= $(shell knoconfig lib)
@@ -44,11 +44,11 @@ libzip/cmake-build/Makefile: libzip/.git
 ziptools.o: ziptools.c makefile ${STATICLIBS}
 	@$(CC) $(CFLAGS) -o $@ -c $<
 	@$(MSG) CC "(ZIPTOOLS)" $@
-ziptools.so: ziptools.o makefile
+ziptools.so: ziptools.o makefile ${STATICLIBS}
 	 $(MKSO) -o $@ ziptools.o -Wl,-soname=$(@F).${MOD_VERSION} \
 	          -Wl,--allow-multiple-definition \
 	          -Wl,--whole-archive ${STATICLIBS} -Wl,--no-whole-archive \
-		 $(LDFLAGS) ${STATICLIBS}
+			${LDFLAGS}
 	 @$(MSG) MKSO "(ZIPTOOLS)" $@
 
 ziptools.dylib: ziptools.o
@@ -86,6 +86,8 @@ clean:
 deepclean deep-clean: clean
 	if test -f libzip/Makefile; then cd ziptools; make clean; fi;
 	rm -rf libzip/cmake-build installed
+fresh: clean
+	make
 
 debian: ziptools.c makefile \
 	dist/debian/rules dist/debian/control \
