@@ -1,18 +1,21 @@
-prefix		::= $(shell knoconfig prefix)
-libsuffix	::= $(shell knoconfig libsuffix)
-KNO_CFLAGS	::= -I. -fPIC $(shell knoconfig cflags)
-KNO_LDFLAGS	::= -fPIC $(shell knoconfig ldflags) $(shell knoconfig libs)
+KNOCONFIG       ::= knoconfig
+prefix		::= $(shell ${KNOCONFIG} prefix)
+libsuffix	::= $(shell ${KNOCONFIG} libsuffix)
+INIT_CFLAGS     ::= ${CFLAGS} -I. -fPIC 
+INIT_LDFAGS     ::= ${LDFLAGS} -fPIC 
+KNO_CFLAGS	::= -I. -fPIC $(shell ${KNOCONFIG} cflags)
+KNO_LDFLAGS	::= -fPIC $(shell ${KNOCONFIG} ldflags) $(shell ${KNOCONFIG} libs)
 LIBZIP_CFLAGS   ::= -Iinstalled/include
 LIBZIP_LDFLAGS  ::= -lz -lbz2 -llzma
 CFLAGS		::= ${CFLAGS} ${KNO_CFLAGS} ${LIBZIP_CFLAGS}
 LDFLAGS		::= ${LDFLAGS} ${KNO_LDFLAGS} ${LIBZIP_LDFLAGS}
-CMODULES	::= $(DESTDIR)$(shell knoconfig cmodules)
-LIBS		::= $(shell knoconfig libs)
-LIB		::= $(shell knoconfig lib)
-INCLUDE		::= $(shell knoconfig include)
-KNO_VERSION	::= $(shell knoconfig version)
-KNO_MAJOR	::= $(shell knoconfig major)
-KNO_MINOR	::= $(shell knoconfig minor)
+CMODULES	::= $(DESTDIR)$(shell ${KNOCONFIG} cmodules)
+LIBS		::= $(shell ${KNOCONFIG} libs)
+LIB		::= $(shell ${KNOCONFIG} lib)
+INCLUDE		::= $(shell ${KNOCONFIG} include)
+KNO_VERSION	::= $(shell ${KNOCONFIG} version)
+KNO_MAJOR	::= $(shell ${KNOCONFIG} major)
+KNO_MINOR	::= $(shell ${KNOCONFIG} minor)
 PKG_RELEASE	::= $(cat ./etc/release)
 DPKG_NAME	::= $(shell ./etc/dpkgname)
 MKSO		::= $(CC) -shared $(LDFLAGS) $(LIBS)
@@ -49,6 +52,7 @@ ziptools.so: ziptools.o makefile ${STATICLIBS}
 	          -Wl,--allow-multiple-definition \
 	          -Wl,--whole-archive ${STATICLIBS} -Wl,--no-whole-archive \
 			${LDFLAGS}
+	@if test ! -z "${COPY_CMODS}"; then cp $@ ${COPY_CMODS}; fi;
 	 @$(MSG) MKSO "(ZIPTOOLS)" $@
 
 ziptools.dylib: ziptools.o
@@ -56,6 +60,7 @@ ziptools.dylib: ziptools.o
 		`basename $(@F) .dylib`.${KNO_MAJOR}.dylib \
 		$(DYLIB_FLAGS) $(LIBZIP_LDFLAGS) \
 		-o $@ ziptools.o 
+	@if test ! -z "${COPY_CMODS}"; then cp $@ ${COPY_CMODS}; fi;
 	@$(MSG) MACLIBTOOL "(ZIPTOOLS)" $@
 
 ${STATICLIBS}: libzip/cmake-build/Makefile
@@ -82,7 +87,7 @@ install: build
 	@echo === Linked ${CMODULES}/${MOD_NAME}.so to ${MOD_NAME}.so.${MOD_VERSION}
 
 clean:
-	rm -f *.o *.${libsuffix}
+	rm -f *.o *.${libsuffix} *.${libsuffix}*
 deepclean deep-clean: clean
 	if test -f libzip/Makefile; then cd ziptools; make clean; fi;
 	rm -rf libzip/cmake-build installed
