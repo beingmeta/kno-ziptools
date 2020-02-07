@@ -1,5 +1,6 @@
 KNOCONFIG         = knoconfig
 KNOBUILD          = knobuild
+
 prefix		::= $(shell ${KNOCONFIG} prefix)
 libsuffix	::= $(shell ${KNOCONFIG} libsuffix)
 INIT_CFLAGS     ::= ${CFLAGS} -I. -fPIC 
@@ -19,21 +20,22 @@ KNO_MAJOR	::= $(shell ${KNOCONFIG} major)
 KNO_MINOR	::= $(shell ${KNOCONFIG} minor)
 PKG_RELEASE	::= $(cat ./etc/release)
 DPKG_NAME	::= $(shell ./etc/dpkgname)
-MKSO		::= $(CC) -shared $(LDFLAGS) $(LIBS)
-MSG		::= echo
-SYSINSTALL      ::= /usr/bin/install -c
-PKG_NAME	::= ziptools
+SUDO            ::= $(shell which sudo)
+
+MKSO		  = $(CC) -shared $(LDFLAGS) $(LIBS)
+MSG		  = echo
+SYSINSTALL        = /usr/bin/install -c
+
+PKG_NAME	  = ziptools
+GPGID             = FE1BC737F9F323D732AA26330620266BE5AFF294
+PKG_VERSION	  = ${KNO_MAJOR}.${KNO_MINOR}.${PKG_RELEASE}
 PKG_RELEASE     ::= $(shell cat etc/release)
-PKG_VERSION	::= ${KNO_MAJOR}.${KNO_MINOR}.${PKG_RELEASE}
 CODENAME	::= $(shell ${KNOCONFIG} codename)
-RELSTATUS	::= $(shell ${KNOBUILD} BUILDSTATUS stable)
+RELSTATUS	::= $(shell ${KNOBUILD} getbuildopt BUILDSTATUS stable)
 DEFAULT_ARCH    ::= $(shell /bin/arch)
 ARCH            ::= $(shell ${KNOBUILD} ARCH ${DEFAULT_ARCH})
 APKREPO         ::= $(shell ${KNOBUILD} getbuildopt APKREPO /srv/repo/kno/apk)
-APK_ARCH_DIR    ::= ${APKREPO}/staging/${ARCH}
-
-GPGID = FE1BC737F9F323D732AA26330620266BE5AFF294
-SUDO  = $(shell which sudo)
+APK_ARCH_DIR      = ${APKREPO}/staging/${ARCH}
 
 default build: ziptools.${libsuffix}
 
@@ -104,6 +106,11 @@ deepclean deep-clean: clean
 	rm -rf libzip/cmake-build installed
 fresh: clean
 	make
+
+gitup gitup-trunk:
+	git checkout trunk && git pull
+
+# Debian packaging
 
 debian: ziptools.c makefile \
 	dist/debian/rules dist/debian/control \
