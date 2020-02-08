@@ -31,8 +31,10 @@ GPGID             = FE1BC737F9F323D732AA26330620266BE5AFF294
 PKG_VERSION	  = ${KNO_MAJOR}.${KNO_MINOR}.${PKG_RELEASE}
 PKG_RELEASE     ::= $(shell cat etc/release)
 CODENAME	::= $(shell ${KNOCONFIG} codename)
-RELSTATUS	::= $(shell ${KNOBUILD} getbuildopt BUILDSTATUS stable)
-ARCH            ::= $(shell ${KNOBUILD} getbuildopt BUILD_ARCH || uname -m)
+REL_BRANCH	::= $(shell ${KNOBUILD} getbuildopt REL_BRANCH current)
+REL_STATUS	::= $(shell ${KNOBUILD} getbuildopt REL_STATUS stable)
+REL_PRIORITY	::= $(shell ${KNOBUILD} getbuildopt REL_PRIORITY medium)
+ARCH            ::= $(shell ${KNOBUILD} getbuildopt BUILD_ARCH || uname -m || echo x86_64)
 APKREPO         ::= $(shell ${KNOBUILD} getbuildopt APKREPO /srv/repo/kno/apk)
 APK_ARCH_DIR      = ${APKREPO}/staging/${ARCH}
 
@@ -119,7 +121,9 @@ debian: ziptools.c makefile \
 
 debian/changelog: debian ziptools.c makefile
 	cat debian/changelog.base | \
-		knobuild debchangelog kno-${PKG_NAME} ${CODENAME} ${RELSTATUS} > $@.tmp
+		knobuild debchangelog kno-${PKG_NAME} ${CODENAME} \
+			${REL_BRANCH} ${REL_STATUS} ${REL_PRIORITY} \
+	    > $@.tmp
 	if test ! -f debian/changelog; then \
 	  mv debian/changelog.tmp debian/changelog; \
 	elif diff debian/changelog debian/changelog.tmp 2>&1 > /dev/null; then \
