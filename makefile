@@ -7,7 +7,7 @@ INIT_CFLAGS     ::= ${CFLAGS} -I. -fPIC
 INIT_LDFAGS     ::= ${LDFLAGS} -fPIC 
 KNO_CFLAGS	::= -I. -fPIC $(shell ${KNOCONFIG} cflags)
 KNO_LDFLAGS	::= -fPIC $(shell ${KNOCONFIG} ldflags) $(shell ${KNOCONFIG} libs)
-LIBZIP_CFLAGS   ::= -Iinstalled/include
+LIBZIP_CFLAGS   ::= -Ilibzip-install/include
 LIBZIP_LDFLAGS  ::= -lz -lbz2 -llzma
 CFLAGS		::= ${CFLAGS} ${KNO_CFLAGS} ${LIBZIP_CFLAGS}
 LDFLAGS		::= ${LDFLAGS} ${KNO_LDFLAGS} ${LIBZIP_LDFLAGS}
@@ -25,6 +25,7 @@ SUDO            ::= $(shell which sudo)
 MKSO		  = $(CC) -shared $(LDFLAGS) $(LIBS)
 MSG		  = echo
 SYSINSTALL        = /usr/bin/install -c
+DIRINSTALL        = /usr/bin/install -d
 
 PKG_NAME	  = ziptools
 GPGID             = FE1BC737F9F323D732AA26330620266BE5AFF294
@@ -40,19 +41,20 @@ APK_ARCH_DIR      = ${APKREPO}/staging/${ARCH}
 
 default build: ziptools.${libsuffix}
 
-STATICLIBS=installed/lib/libzip.a
+STATICLIBS=libzip-install/lib/libzip.a
+
+libzip-build libzip-install:
+	${DIRINSTALL} $@
 
 libzip/.git:
 	git submodule init
 	git submodule update
-libzip/cmake-build/Makefile: libzip/.git
-	if test ! -d libzip/cmake-build; then mkdir libzip/cmake-build; fi && \
-	cd libzip/cmake-build && \
+libzip-build/Makefile: libzip/.git libzip-build libzip-install
 	cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
 	      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	      -DBUILD_SHARED_LIBS=off \
-	      -DCMAKE_INSTALL_PREFIX=../../installed \
-	      ..
+	      -DCMAKE_INSTALL_PREFIX=libzip-install \
+	      -S libzip -B libzip-build
 
 ziptools.o: ziptools.c makefile ${STATICLIBS}
 	@$(CC) $(CFLAGS) -o $@ -c $<
@@ -73,13 +75,12 @@ ziptools.dylib: ziptools.o
 	@if test ! -z "${COPY_CMODS}"; then cp $@ ${COPY_CMODS}; fi;
 	@$(MSG) MACLIBTOOL "(ZIPTOOLS)" $@
 
-${STATICLIBS}:
-	make libzip/cmake-build/Makefile
-	make -C libzip/cmake-build install
-	if test -d installed/lib; then \
+${STATICLIBS}: libzip-build/Makefile libzip-install
+	make -C libzip-build install
+	if test -d libzip-install/lib; then \
 	  echo > /dev/null; \
-	elif test -d installed/lib64; then \
-	  ln -sf lib64 installed/lib; \
+	elif test -d libzip-install/lib64; then \
+	  ln -sf lib64 libzip-install/lib; \
 	else echo "No install libdir"; \
 	fi
 
@@ -92,7 +93,7 @@ ${CMODULES}:
 
 install: build ${CMODULES}
 	@${SUDO} ${SYSINSTALL} ${PKG_NAME}.${libsuffix} ${CMODULES}/${PKG_NAME}.so.${PKG_VERSION}
-	@echo === Installed ${CMODULES}/${PKG_NAME}.so.${PKG_VERSION}
+	@echo === Libzip-Install ${CMODULES}/${PKG_NAME}.so.${PKG_VERSION}
 	@${SUDO} ln -sf ${PKG_NAME}.so.${PKG_VERSION} ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}.${KNO_MINOR}
 	@echo === Linked ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}.${KNO_MINOR} to ${PKG_NAME}.so.${PKG_VERSION}
 	@${SUDO} ln -sf ${PKG_NAME}.so.${PKG_VERSION} ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}
@@ -103,8 +104,7 @@ install: build ${CMODULES}
 clean:
 	rm -f *.o *.${libsuffix} *.${libsuffix}*
 deepclean deep-clean: clean
-	if test -f libzip/Makefile; then cd ziptools; make clean; fi;
-	rm -rf libzip/cmake-build installed
+	rm -rf libzip-build libzip-install
 fresh: clean
 	make
 
