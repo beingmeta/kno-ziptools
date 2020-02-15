@@ -50,11 +50,11 @@ libzip/.git:
 	git submodule init
 	git submodule update
 libzip-build/Makefile: libzip/.git libzip-build libzip-install
-	cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
+	cd libzip-build; cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
 	      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	      -DBUILD_SHARED_LIBS=off \
-	      -DCMAKE_INSTALL_PREFIX=libzip-install \
-	      -S libzip -B libzip-build
+	      -DCMAKE_INSTALL_PREFIX=../libzip-install \
+	      ../libzip
 
 ziptools.o: ziptools.c makefile ${STATICLIBS}
 	@$(CC) $(CFLAGS) -o $@ -c $<
