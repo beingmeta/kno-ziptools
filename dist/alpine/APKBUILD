@@ -17,18 +17,18 @@ builddir="${srcdir}/kno-ziptools"
 
 build() {
 #	echo "@build pwd=$(pwd) startdir=${startdir} srcdir=${srcdir} pkgdir=${pkgdir} builddir=${builddir}"
-	cp -r ../../../../installed .
-	make
+	cp -r ../../../../libzip-install installed
+	make LIBZIPINSTALL=./installed
 }
 
 check() {
 #	echo "@check pwd=$(pwd) startdir=${startdir} srcdir=${srcdir} pkgdir=${pkgdir} builddir=${builddir}"
-	make
+	make LIBZIPINSTALL=./installed
 }
 
 package() {
 #	echo "@package pwd=$(pwd) startdir=${startdir} srcdir=${srcdir} pkgdir=${pkgdir} builddir=${builddir}"
-	make DESTDIR="$pkgdir" SUDO= install
+	make LIBZIPINSTALL=./installed DESTDIR="$pkgdir" SUDO= install
 }
 	
 

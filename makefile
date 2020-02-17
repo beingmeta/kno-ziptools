@@ -1,5 +1,6 @@
 KNOCONFIG         = knoconfig
 KNOBUILD          = knobuild
+LIBZIPINSTALL     = libzip-install
 
 prefix		::= $(shell ${KNOCONFIG} prefix)
 libsuffix	::= $(shell ${KNOCONFIG} libsuffix)
@@ -7,8 +8,8 @@ INIT_CFLAGS     ::= ${CFLAGS} -I. -fPIC
 INIT_LDFAGS     ::= ${LDFLAGS} -fPIC 
 KNO_CFLAGS	::= -I. -fPIC $(shell ${KNOCONFIG} cflags)
 KNO_LDFLAGS	::= -fPIC $(shell ${KNOCONFIG} ldflags) $(shell ${KNOCONFIG} libs)
-LIBZIP_CFLAGS   ::= $(shell ./etc/pkc --static --cflags libzip)
-LIBZIP_LDFLAGS  ::= $(shell ./etc/pkc --static --libs libzip)
+LIBZIP_CFLAGS   ::= $(shell INSTALLROOT=${LIBZIPINSTALL} ./etc/pkc --static --cflags libzip)
+LIBZIP_LDFLAGS  ::= $(shell INSTALLROOT=${LIBZIPINSTALL} ./etc/pkc --static --libs libzip)
 CMODULES	::= $(DESTDIR)$(shell ${KNOCONFIG} cmodules)
 LIBS		::= $(shell ${KNOCONFIG} libs)
 LIB		::= $(shell ${KNOCONFIG} lib)
@@ -41,7 +42,7 @@ APK_ARCH_DIR      = ${APKREPO}/staging/${ARCH}
 
 default build: ziptools.${libsuffix}
 
-STATICLIBS=libzip-install/lib/libzip.a
+STATICLIBS=${LIBZIPINSTALL}/lib/libzip.a
 
 libzip-build libzip-install:
 	${DIRINSTALL} $@
@@ -57,7 +58,7 @@ libzip-build/Makefile: libzip/.git libzip-build libzip-install
 	      ../libzip
 
 ziptools.o: ziptools.c makefile ${STATICLIBS}
-	@$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 	@$(MSG) CC "(ZIPTOOLS)" $@
 ziptools.so: ziptools.o makefile ${STATICLIBS}
 	 $(MKSO) -o $@ ziptools.o -Wl,-soname=$(@F).${PKG_VERSION} \
@@ -75,7 +76,7 @@ ziptools.dylib: ziptools.o
 	@if test ! -z "${COPY_CMODS}"; then cp $@ ${COPY_CMODS}; fi;
 	@$(MSG) MACLIBTOOL "(ZIPTOOLS)" $@
 
-${STATICLIBS}: libzip-build/Makefile libzip-install
+libzip-install/lib/libzip.a: libzip-build/Makefile libzip-install
 	make -C libzip-build install
 	if test -d libzip-install/lib; then \
 	  echo > /dev/null; \
