@@ -17,10 +17,15 @@ INCLUDE		::= $(shell ${KNOCONFIG} include)
 KNO_VERSION	::= $(shell ${KNOCONFIG} version)
 KNO_MAJOR	::= $(shell ${KNOCONFIG} major)
 KNO_MINOR	::= $(shell ${KNOCONFIG} minor)
-PKG_RELEASE	::= $(cat ./etc/release)
-DPKG_NAME	::= $(shell ./etc/dpkgname)
-SUDO            ::= $(shell which sudo)
+PKG_VERSION     ::= $(shell cat ./version)
+PKG_MAJOR       ::= $(shell cat ./version | cut -d. -f1)
+FULL_VERSION    ::= ${KNO_MAJOR}.${KNO_MINOR}.${PKG_VERSION}
+PATCHLEVEL      ::= $(shell u8_gitpatchcount ./version)
+PATCH_VERSION   ::= ${FULL_VERSION}-${PATCHLEVEL}
 
+PKG_NAME	::= ziptools
+DPKG_NAME	::= ${PKG_NAME}_${PATCH_VERSION}
+SUDO            ::= $(shell which sudo)
 CFLAGS		  = ${INIT_CFLAGS} ${KNO_CFLAGS} ${LIBZIP_CFLAGS}
 LDFLAGS		  = ${INIT_LDFLAGS} ${KNO_LDFLAGS} ${LIBZIP_LDFLAGS}
 MKSO		  = $(CC) -shared $(LDFLAGS) $(LIBS)
@@ -28,10 +33,7 @@ MSG		  = echo
 SYSINSTALL        = /usr/bin/install -c
 DIRINSTALL        = /usr/bin/install -d
 
-PKG_NAME	  = ziptools
 GPGID             = FE1BC737F9F323D732AA26330620266BE5AFF294
-PKG_VERSION	  = ${KNO_MAJOR}.${KNO_MINOR}.${PKG_RELEASE}
-PKG_RELEASE     ::= $(shell cat etc/release)
 CODENAME	::= $(shell ${KNOCONFIG} codename)
 REL_BRANCH	::= $(shell ${KNOBUILD} getbuildopt REL_BRANCH current)
 REL_STATUS	::= $(shell ${KNOBUILD} getbuildopt REL_STATUS stable)
@@ -61,7 +63,7 @@ ziptools.o: ziptools.c makefile ${STATICLIBS}
 	$(CC) $(CFLAGS) -o $@ -c $<
 	@$(MSG) CC "(ZIPTOOLS)" $@
 ziptools.so: ziptools.o makefile ${STATICLIBS}
-	 $(MKSO) -o $@ ziptools.o -Wl,-soname=$(@F).${PKG_VERSION} \
+	 $(MKSO) -o $@ ziptools.o -Wl,-soname=$(@F).${FULL_VERSION} \
 	          -Wl,--allow-multiple-definition \
 	          -Wl,--whole-archive ${STATICLIBS} -Wl,--no-whole-archive \
 			${LDFLAGS}
@@ -93,14 +95,16 @@ ${CMODULES}:
 	@install -d ${CMODULES}
 
 install: build ${CMODULES}
-	@${SUDO} ${SYSINSTALL} ${PKG_NAME}.${libsuffix} ${CMODULES}/${PKG_NAME}.so.${PKG_VERSION}
-	@echo === Libzip-Install ${CMODULES}/${PKG_NAME}.so.${PKG_VERSION}
-	@${SUDO} ln -sf ${PKG_NAME}.so.${PKG_VERSION} ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}.${KNO_MINOR}
-	@echo === Linked ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}.${KNO_MINOR} to ${PKG_NAME}.so.${PKG_VERSION}
-	@${SUDO} ln -sf ${PKG_NAME}.so.${PKG_VERSION} ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}
-	@echo === Linked ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR} to ${PKG_NAME}.so.${PKG_VERSION}
-	@${SUDO} ln -sf ${PKG_NAME}.so.${PKG_VERSION} ${CMODULES}/${PKG_NAME}.so
-	@echo === Linked ${CMODULES}/${PKG_NAME}.so to ${PKG_NAME}.so.${PKG_VERSION}
+	@${SUDO} ${SYSINSTALL} ${PKG_NAME}.${libsuffix} ${CMODULES}/${PKG_NAME}.so.${FULL_VERSION}
+	@echo === Libzip-Install ${CMODULES}/${PKG_NAME}.so.${FULL_VERSION}
+	@${SUDO} ln -sf ${PKG_NAME}.so.${FULL_VERSION} ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}.${KNO_MINOR}.${PKG_MAJOR}
+	@echo === Linked ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}.${KNO_MINOR}.${PKG_MAJOR} to ${PKG_NAME}.so.${FULL_VERSION}
+	@${SUDO} ln -sf ${PKG_NAME}.so.${FULL_VERSION} ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}.${KNO_MINOR}
+	@echo === Linked ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}.${KNO_MINOR} to ${PKG_NAME}.so.${FULL_VERSION}
+	@${SUDO} ln -sf ${PKG_NAME}.so.${FULL_VERSION} ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR}
+	@echo === Linked ${CMODULES}/${PKG_NAME}.so.${KNO_MAJOR} to ${PKG_NAME}.so.${FULL_VERSION}
+	@${SUDO} ln -sf ${PKG_NAME}.so.${FULL_VERSION} ${CMODULES}/${PKG_NAME}.so
+	@echo === Linked ${CMODULES}/${PKG_NAME}.so to ${PKG_NAME}.so.${FULL_VERSION}
 
 clean:
 	rm -f *.o *.${libsuffix} *.${libsuffix}*
