@@ -67,7 +67,6 @@ ziptools.so: ziptools.o makefile ${STATICLIBS}
 	          -Wl,--allow-multiple-definition \
 	          -Wl,--whole-archive ${STATICLIBS} -Wl,--no-whole-archive \
 			${LDFLAGS}
-	@if test ! -z "${COPY_CMODS}"; then cp $@ ${COPY_CMODS}; fi;
 	 @$(MSG) MKSO "(ZIPTOOLS)" $@
 
 ziptools.dylib: ziptools.o
@@ -75,7 +74,6 @@ ziptools.dylib: ziptools.o
 		`basename $(@F) .dylib`.${KNO_MAJOR}.dylib \
 		$(DYLIB_FLAGS) $(LIBZIP_LDFLAGS) \
 		-o $@ ziptools.o 
-	@if test ! -z "${COPY_CMODS}"; then cp $@ ${COPY_CMODS}; fi;
 	@$(MSG) MACLIBTOOL "(ZIPTOOLS)" $@
 
 libzip-install/lib/libzip.a: libzip-build/Makefile libzip-install
