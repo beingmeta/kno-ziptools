@@ -7,7 +7,8 @@ libsuffix	::= $(shell ${KNOCONFIG} libsuffix)
 INIT_CFLAGS     ::= ${CFLAGS} -I. -fPIC 
 INIT_LDFAGS     ::= ${LDFLAGS} -fPIC 
 KNO_CFLAGS	::= -I. -fPIC $(shell ${KNOCONFIG} cflags)
-KNO_LDFLAGS	::= -fPIC $(shell ${KNOCONFIG} ldflags) $(shell ${KNOCONFIG} libs)
+KNO_LDFLAGS	::= -fPIC $(shell ${KNOCONFIG} ldflags)
+KNO_LIBS	::= $(shell ${KNOCONFIG} libs)
 LIBZIP_CFLAGS   ::= $(shell INSTALLROOT=${LIBZIPINSTALL} ./etc/pkc --static --cflags libzip)
 LIBZIP_LDFLAGS  ::= $(shell INSTALLROOT=${LIBZIPINSTALL} ./etc/pkc --static --libs libzip)
 CMODULES	::= $(DESTDIR)$(shell ${KNOCONFIG} cmodules)
