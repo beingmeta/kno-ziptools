@@ -45,9 +45,11 @@ ARCH            ::= $(shell ${KNOBUILD} getbuildopt BUILD_ARCH || uname -m || ec
 APKREPO         ::= $(shell ${KNOBUILD} getbuildopt APKREPO /srv/repo/kno/apk)
 APK_ARCH_DIR      = ${APKREPO}/staging/${ARCH}
 
-default build: ziptools.${libsuffix}
-
 STATICLIBS=${LIBZIPINSTALL}/lib/libzip.a
+
+default build:
+	make ${STATICLIBS}
+	make ziptools.${libsuffix}
 
 libzip-build libzip-install:
 	${DIRINSTALL} $@
