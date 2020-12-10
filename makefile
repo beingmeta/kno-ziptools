@@ -139,8 +139,13 @@ dist/debian.built: ziptools.c makefile debian/changelog
 	touch $@
 
 dist/debian.signed: dist/debian.built
-	debsign --re-sign -k${GPGID} ../kno-ziptools_*.changes && \
-	touch $@
+	if test "$GPGID" = "none" || test -z "${GPGID}"; then  		\
+	  echo "Skipping debian signing";				\
+	  touch $@;							\
+	else 								\
+	  debsign --re-sign -k${GPGID} ../kno-ziptools_*.changes && 	\
+	  touch $@;							\
+	fi;
 
 dist/debian.updated: dist/debian.signed
 	dupload -c ./dist/dupload.conf --nomail --to bionic ../kno-ziptools_*.changes && touch $@
