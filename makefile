@@ -65,7 +65,7 @@ libzip-build/Makefile: libzip/.git libzip-build libzip-install
 	      ../libzip
 
 ziptools.o: ziptools.c makefile ${STATICLIBS}
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) -D_FILEINFO="\"$(shell u8_fileinfo ./$< $(dirname $(pwd))/)\"" -o $@ -c $<
 	@$(MSG) CC "(ZIPTOOLS)" $@
 ziptools.so: ziptools.o makefile ${STATICLIBS}
 	 $(MKSO) -o $@ ziptools.o -Wl,-soname=$(@F).${FULL_VERSION} \
