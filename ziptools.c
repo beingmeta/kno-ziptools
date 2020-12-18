@@ -112,7 +112,6 @@ static lispval zipreopen(struct KNO_ZIPFILE *zf,int locked)
 
 KNO_DEFCPRIM("zipfile?",iszipfile_prim,
 	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "`(ZIPFILE? *arg0*)` "
 	     "**undocumented**",
 	     {"arg",kno_any_type,KNO_VOID})
 static lispval iszipfile_prim(lispval arg)
@@ -148,7 +147,6 @@ static lispval zipopen(u8_string path,int zflags,int oflags)
 
 KNO_DEFCPRIM("zip/open",zipopen_prim,
 	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(1),
-	     "`(ZIP/OPEN *arg0* [*arg1*])` "
 	     "**undocumented**",
 	     {"filename",kno_string_type,KNO_VOID},
 	     {"create",kno_any_type,KNO_FALSE})
@@ -161,7 +159,6 @@ static lispval zipopen_prim(lispval filename,lispval create)
 
 KNO_DEFCPRIM("zip/make",zipmake_prim,
 	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "`(ZIP/MAKE *arg0*)` "
 	     "**undocumented**",
 	     {"filename",kno_string_type,KNO_VOID})
 static lispval zipmake_prim(lispval filename)
@@ -172,7 +169,6 @@ static lispval zipmake_prim(lispval filename)
 
 KNO_DEFCPRIM("zip/filename",zipfilename_prim,
 	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "`(ZIP/FILENAME *arg0*)` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
 static lispval zipfilename_prim(lispval zipfile)
@@ -184,7 +180,6 @@ static lispval zipfilename_prim(lispval zipfile)
 
 KNO_DEFCPRIM("zip/close!",close_zipfile,
 	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "`(ZIP/CLOSE! *arg0*)` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
 static lispval close_zipfile(lispval zipfile)
@@ -208,7 +203,6 @@ static lispval close_zipfile(lispval zipfile)
 
 KNO_DEFCPRIM("zip/open?",zipfile_openp,
 	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "`(ZIP/OPEN? *arg0*)` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
 static lispval zipfile_openp(lispval zipfile)
@@ -233,7 +227,6 @@ static long long int zipadd
 
 KNO_DEFCPRIM("zip/add!",zipadd_prim,
 	     KNO_MAX_ARGS(5)|KNO_MIN_ARGS(3),
-	     "`(ZIP/ADD! *arg0* *arg1* *arg2* [*arg3*] [*arg4*])` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
 	     {"filename",kno_string_type,KNO_VOID},
@@ -312,7 +305,6 @@ static lispval zipadd_prim(lispval zipfile,lispval filename,lispval value,
 
 KNO_DEFCPRIM("zip/drop!",zipdrop_prim,
 	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
-	     "`(ZIP/DROP! *arg0* *arg1*)` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
 	     {"filename",kno_string_type,KNO_VOID})
@@ -354,7 +346,6 @@ static int istext(u8_byte *buf,int size)
 
 KNO_DEFCPRIM("zip/get",zipget_prim,
 	     KNO_MAX_ARGS(3)|KNO_MIN_ARGS(2),
-	     "`(ZIP/GET *arg0* *arg1* [*arg2*])` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
 	     {"filename",kno_string_type,KNO_VOID},
@@ -409,7 +400,6 @@ static lispval zipget_prim(lispval zipfile,lispval filename,lispval isbinary)
 
 KNO_DEFCPRIM("zip/exists?",zipexists_prim,
 	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
-	     "`(ZIP/EXISTS? *arg0* *arg1*)` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
 	     {"filename",kno_string_type,KNO_VOID})
@@ -436,7 +426,6 @@ static lispval zipexists_prim(lispval zipfile,lispval filename)
 
 KNO_DEFCPRIM("zip/modtime",zipmodtime_prim,
 	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
-	     "`(ZIP/MODTIME *arg0* *arg1*)` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
 	     {"filename",kno_string_type,KNO_VOID})
@@ -470,7 +459,6 @@ static lispval zipmodtime_prim(lispval zipfile,lispval filename)
 
 KNO_DEFCPRIM("zip/getsize",zipgetsize_prim,
 	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
-	     "`(ZIP/GETSIZE *arg0* *arg1*)` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
 	     {"filename",kno_string_type,KNO_VOID})
@@ -504,7 +492,6 @@ static lispval zipgetsize_prim(lispval zipfile,lispval filename)
 
 KNO_DEFCPRIM("zip/getfiles",zipgetfiles_prim,
 	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "`(ZIP/GETFILES *arg0*)` "
 	     "**undocumented**",
 	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
 static lispval zipgetfiles_prim(lispval zipfile)
@@ -533,7 +520,6 @@ static lispval zipgetfiles_prim(lispval zipfile)
 
 KNO_DEFCPRIM("zip/features",zipfeatures_prim,
 	     KNO_MAX_ARGS(0)|KNO_MIN_ARGS(0),
-	     "`(ZIP/FEATURES)` "
 	     "**undocumented**")
 static lispval zipfeatures_prim()
 {
