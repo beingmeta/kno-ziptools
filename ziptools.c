@@ -566,8 +566,7 @@ KNO_EXPORT int kno_init_ziptools()
   ziptools_module =
     kno_new_cmodule("ziptools",0,kno_init_ziptools);
 
-  kno_zipfile_type = kno_register_cons_type("ZIPFILE");
-  kno_add_type_alias(KNO_ZIPFILE_TYPE,kno_zipfile_type);
+  kno_zipfile_type = kno_register_cons_type("ZIPFILE",KNO_ZIPFILE_TYPE);
 
   kno_unparsers[kno_zipfile_type]=unparse_zipfile;
   kno_recyclers[kno_zipfile_type]=recycle_zipfile;
