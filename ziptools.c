@@ -31,7 +31,7 @@ static u8_condition ZipFileError=_("Zip file error");
 
 KNO_EXPORT kno_lisp_type kno_zipfile_type;
 kno_lisp_type kno_zipfile_type;
-#define KNO_ZIPFILE_TYPE 0x5486c18b3e0a881L
+#define KNO_ZIPFILE_TYPE 0x4640ce0L
 
 typedef struct KNO_ZIPFILE {
   KNO_CONS_HEADER;
