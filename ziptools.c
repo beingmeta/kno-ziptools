@@ -536,6 +536,54 @@ static lispval zipfeatures_prim()
   return result;
 }
 
+#if 0
+static void set_prop(lispval result,lispval symbol,lispval consed_val)
+{
+  kno_store(result,symbol,consed_val);
+  kno_decref(consed_val);
+}
+
+static lispval zip_gpath_handler(lispval zipfile,lispval path,lispval aspect,lispval opts)
+{
+  if (aspect == existsp_symbol)
+    return zipexists_prim(zipfile,path);
+  else if (aspect == KNOSYM_CONTENT)
+    return zipget_prim(zipfile,path,KNO_VOID);
+  else {
+    int get_content = (kno_overlapp(aspect,KNOSYM_CONTENT));
+    struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
+    u8_string fname = KNO_CSTRING(pathh);
+    struct zip_stat zstat; int zret;
+    struct zip_file *zfile = NULL;
+    int index;
+    if ((fname[0]=='.')&&(fname[1]=='/')) fname = fname+2;
+    u8_lock_mutex(&(zf->zipfile_lock));
+    if (zf->closed) {
+      lispval errval = zipreopen(zf,1);
+      if (KNO_ABORTP(errval)) {
+	u8_unlock_mutex(&(zf->zipfile_lock));
+	return errval;}}
+    index = zip_name_locate(zf->zip,fname,0);
+    if (index<0) {
+      u8_unlock_mutex(&(zf->zipfile_lock));
+      return KNO_FALSE;}
+    else if ((zret = zip_stat(zf->zip,fname,0,&zstat))) {
+      u8_unlock_mutex(&(zf->zipfile_lock));
+      return ziperr("zip_gpath_handler/stat",zf,filename);}
+    else {
+      if (get_content) {
+	zfile = zip_fopen(zf->zip,fname,0);
+	if (zfile == NULL) {
+	  u8_unlock_mutex(&(zf->zipfile_lock));
+	  return ziperr("zip_gpath_handler/open",zf,filename);}}
+      lispval result = kno_make_slotmap(5,0,NULL);
+      time_t modified = zstat.mtime;
+      set_prop(result,KNOSYM(modtime),kno_time2timestamp(zstat.mtime));
+      set_prop(result,KNOSYM(modtime),KNO_INT(zstat.size));
+    }}
+}
+#endif
+
 /* Initialization */
 
 KNO_EXPORT int kno_init_ziptools(void) KNO_LIBINIT_FN;
@@ -553,6 +601,8 @@ KNO_EXPORT int kno_init_ziptools()
     kno_new_cmodule("ziptools",0,kno_init_ziptools);
 
   kno_zipfile_type = kno_register_cons_type("ZIPFILE",KNO_ZIPFILE_TYPE);
+
+  kno_store(ziptools_module,kno_intern("zipfile-type"),KNO_CYTPE(kno_zipfile_type));
 
   kno_unparsers[kno_zipfile_type]=unparse_zipfile;
   kno_recyclers[kno_zipfile_type]=recycle_zipfile;
