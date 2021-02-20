@@ -12,6 +12,7 @@ KNO_LIBS	::= $(shell ${KNOCONFIG} libs)
 LIBZIP_CFLAGS   ::= $(shell INSTALLROOT=${LIBZIPINSTALL} ./etc/pkc --static --cflags libzip)
 LIBZIP_LDFLAGS  ::= $(shell INSTALLROOT=${LIBZIPINSTALL} ./etc/pkc --static --libs libzip)
 CMODULES	::= $(DESTDIR)$(shell ${KNOCONFIG} cmodules)
+INSTALLMODULES	::= $(DESTDIR)$(shell ${KNOCONFIG} installed_modules)
 LIBS		::= $(shell ${KNOCONFIG} libs)
 LIB		::= $(shell ${KNOCONFIG} lib)
 INCLUDE		::= $(shell ${KNOCONFIG} include)
@@ -97,8 +98,14 @@ ziptools.so ziptools.dylib: staticlibs
 ${CMODULES}:
 	@install -d ${CMODULES}
 
-install: build ${CMODULES}
+install: install-cmodule install-scheme
+
+install-cmodule: build ${CMODULES}
 	${SUDO} u8_install_shared ${PKG_NAME}.${libsuffix} ${CMODULES} ${FULL_VERSION} "${SYSINSTALL}"
+
+install-scheme:
+	install -D scheme/gpath/ziptools.scm \
+		${INSTALLMODULES}/gpath/ziptools.scm
 
 clean:
 	rm -f *.o *.${libsuffix} *.${libsuffix}*

@@ -612,6 +612,8 @@ KNO_EXPORT int kno_init_ziptools()
 
   kno_finish_module(ziptools_module);
 
+  kno_load_module("gpath/ziptools");
+
   u8_register_source_file(_FILEINFO);
 
   return 1;

@@ -3,7 +3,7 @@
 
 (in-module 'gpath/ziptools)
 
-(use-module '{ziptools mimetable})
+(use-module '{ziptools net/mimetable})
 
 (define (ziptools:gpath:get zip (path #f) (aspect #f) (opts #f) (name) (ctype) (encoding))
   (default! ctype (getopt opts 'content-type (guess-mimetype path #f opts)))
