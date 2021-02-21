@@ -104,8 +104,7 @@ install-cmodule: build ${CMODULES}
 	${SUDO} u8_install_shared ${PKG_NAME}.${libsuffix} ${CMODULES} ${FULL_VERSION} "${SYSINSTALL}"
 
 install-scheme:
-	install -D scheme/gpath/ziptools.scm \
-		${INSTALLMODULES}/gpath/ziptools.scm
+	${SUDO} install -D scheme/gpath/ziptools.scm ${INSTALLMODULES}/gpath/ziptools.scm
 
 clean:
 	rm -f *.o *.${libsuffix} *.${libsuffix}*
