@@ -1,6 +1,7 @@
 /* -*- Mode: C; Character-encoding: utf-8; -*- */
 
 /* Copyright (C) 2007-2019 beingmeta, inc.
+   Copyright (C) 2020-2021 beingmeta, LLC
    This file is part of beingmeta's Kno platform and is copyright
    and a valuable trade secret of beingmeta, inc.
 */
@@ -111,9 +112,9 @@ static lispval zipreopen(struct KNO_ZIPFILE *zf,int locked)
 
 
 DEFC_PRIM("zipfile?",iszipfile_prim,
-	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "**undocumented**",
-	     {"arg",kno_any_type,KNO_VOID})
+	  KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
+	  "**undocumented**",
+	  {"arg",kno_any_type,KNO_VOID})
 static lispval iszipfile_prim(lispval arg)
 {
   if (KNO_TYPEP(arg,kno_zipfile_type)) return KNO_TRUE;
@@ -146,10 +147,10 @@ static lispval zipopen(u8_string path,int zflags,int oflags)
 }
 
 DEFC_PRIM("zip/open",zipopen_prim,
-	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(1),
-	     "**undocumented**",
-	     {"filename",kno_string_type,KNO_VOID},
-	     {"create",kno_any_type,KNO_FALSE})
+	  KNO_MAX_ARGS(2)|KNO_MIN_ARGS(1),
+	  "**undocumented**",
+	  {"filename",kno_string_type,KNO_VOID},
+	  {"create",kno_any_type,KNO_FALSE})
 static lispval zipopen_prim(lispval filename,lispval create)
 {
   if ((KNO_FALSEP(create))||(KNO_VOIDP(create)))
@@ -158,9 +159,9 @@ static lispval zipopen_prim(lispval filename,lispval create)
 }
 
 DEFC_PRIM("zip/make",zipmake_prim,
-	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "**undocumented**",
-	     {"filename",kno_string_type,KNO_VOID})
+	  KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
+	  "**undocumented**",
+	  {"filename",kno_string_type,KNO_VOID})
 static lispval zipmake_prim(lispval filename)
 {
   return zipopen(KNO_CSTRING(filename),0,ZIP_CREATE|ZIP_EXCL);
@@ -168,9 +169,9 @@ static lispval zipmake_prim(lispval filename)
 
 
 DEFC_PRIM("zip/filename",zipfilename_prim,
-	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
+	  KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
 static lispval zipfilename_prim(lispval zipfile)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -179,9 +180,9 @@ static lispval zipfilename_prim(lispval zipfile)
 
 
 DEFC_PRIM("zip/close!",close_zipfile,
-	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
+	  KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
 static lispval close_zipfile(lispval zipfile)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -202,9 +203,9 @@ static lispval close_zipfile(lispval zipfile)
 
 
 DEFC_PRIM("zip/open?",zipfile_openp,
-	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
+	  KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
 static lispval zipfile_openp(lispval zipfile)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -226,13 +227,13 @@ static long long int zipadd
 
 
 DEFC_PRIM("zip/add!",zipadd_prim,
-	     KNO_MAX_ARGS(5)|KNO_MIN_ARGS(3),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
-	     {"filename",kno_string_type,KNO_VOID},
-	     {"value",kno_any_type,KNO_VOID},
-	     {"comment",kno_any_type,KNO_FALSE},
-	     {"compress",kno_any_type,KNO_TRUE})
+	  KNO_MAX_ARGS(5)|KNO_MIN_ARGS(3),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
+	  {"filename",kno_string_type,KNO_VOID},
+	  {"value",kno_any_type,KNO_VOID},
+	  {"comment",kno_any_type,KNO_FALSE},
+	  {"compress",kno_any_type,KNO_TRUE})
 static lispval zipadd_prim(lispval zipfile,lispval filename,lispval value,
 			   lispval comment,lispval compress)
 {
@@ -304,10 +305,10 @@ static lispval zipadd_prim(lispval zipfile,lispval filename,lispval value,
 
 
 DEFC_PRIM("zip/drop!",zipdrop_prim,
-	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
-	     {"filename",kno_string_type,KNO_VOID})
+	  KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
+	  {"filename",kno_string_type,KNO_VOID})
 static lispval zipdrop_prim(lispval zipfile,lispval filename)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -345,11 +346,11 @@ static int istext(u8_byte *buf,int size)
 
 
 DEFC_PRIM("zip/get",zipget_prim,
-	     KNO_MAX_ARGS(3)|KNO_MIN_ARGS(2),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
-	     {"filename",kno_string_type,KNO_VOID},
-	     {"isbinary",kno_any_type,KNO_VOID})
+	  KNO_MAX_ARGS(3)|KNO_MIN_ARGS(2),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
+	  {"filename",kno_string_type,KNO_VOID},
+	  {"isbinary",kno_any_type,KNO_VOID})
 static lispval zipget_prim(lispval zipfile,lispval filename,lispval isbinary)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -399,10 +400,10 @@ static lispval zipget_prim(lispval zipfile,lispval filename,lispval isbinary)
 
 
 DEFC_PRIM("zip/exists?",zipexists_prim,
-	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
-	     {"filename",kno_string_type,KNO_VOID})
+	  KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
+	  {"filename",kno_string_type,KNO_VOID})
 static lispval zipexists_prim(lispval zipfile,lispval filename)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -425,10 +426,10 @@ static lispval zipexists_prim(lispval zipfile,lispval filename)
 
 
 DEFC_PRIM("zip/modtime",zipmodtime_prim,
-	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
-	     {"filename",kno_string_type,KNO_VOID})
+	  KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
+	  {"filename",kno_string_type,KNO_VOID})
 static lispval zipmodtime_prim(lispval zipfile,lispval filename)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -458,10 +459,10 @@ static lispval zipmodtime_prim(lispval zipfile,lispval filename)
 
 
 DEFC_PRIM("zip/getsize",zipgetsize_prim,
-	     KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
-	     {"filename",kno_string_type,KNO_VOID})
+	  KNO_MAX_ARGS(2)|KNO_MIN_ARGS(2),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID},
+	  {"filename",kno_string_type,KNO_VOID})
 static lispval zipgetsize_prim(lispval zipfile,lispval filename)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -491,9 +492,9 @@ static lispval zipgetsize_prim(lispval zipfile,lispval filename)
 
 
 DEFC_PRIM("zip/getfiles",zipgetfiles_prim,
-	     KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
-	     "**undocumented**",
-	     {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
+	  KNO_MAX_ARGS(1)|KNO_MIN_ARGS(1),
+	  "**undocumented**",
+	  {"zipfile",KNO_ZIPFILE_TYPE,KNO_VOID})
 static lispval zipgetfiles_prim(lispval zipfile)
 {
   struct KNO_ZIPFILE *zf = kno_consptr(kno_zipfile,zipfile,kno_zipfile_type);
@@ -519,8 +520,8 @@ static lispval zipgetfiles_prim(lispval zipfile)
 
 
 DEFC_PRIM("zip/features",zipfeatures_prim,
-	     KNO_MAX_ARGS(0)|KNO_MIN_ARGS(0),
-	     "**undocumented**")
+	  KNO_MAX_ARGS(0)|KNO_MIN_ARGS(0),
+	  "**undocumented**")
 static lispval zipfeatures_prim()
 {
   lispval result = KNO_EMPTY_CHOICE;
