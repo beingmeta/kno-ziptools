@@ -19,17 +19,17 @@ INCLUDE		::= $(shell ${KNOCONFIG} include)
 KNO_VERSION	::= $(shell ${KNOCONFIG} version)
 KNO_MAJOR	::= $(shell ${KNOCONFIG} major)
 KNO_MINOR	::= $(shell ${KNOCONFIG} minor)
-PKG_VERSION     ::= $(shell cat ./version)
-PKG_MAJOR       ::= $(shell cat ./version | cut -d. -f1)
+PKG_VERSION     ::= $(shell u8_gitversion ./etc/knomod_version)
+PKG_MAJOR       ::= $(shell cat ./etc/knomod_version | cut -d. -f1)
 FULL_VERSION    ::= ${KNO_MAJOR}.${KNO_MINOR}.${PKG_VERSION}
-PATCHLEVEL      ::= $(shell u8_gitpatchcount ./version)
+PATCHLEVEL      ::= $(shell u8_gitpatchcount ./etc/knomod_version)
 PATCH_VERSION   ::= ${FULL_VERSION}-${PATCHLEVEL}
 
 PKG_NAME	::= ziptools
 DPKG_NAME	::= ${PKG_NAME}_${PATCH_VERSION}
 SUDO            ::= $(shell which sudo)
-CFLAGS		  = ${INIT_CFLAGS} ${KNO_CFLAGS} ${LIBZIP_CFLAGS}
-LDFLAGS		  = ${INIT_LDFLAGS} ${KNO_LDFLAGS} ${LIBZIP_LDFLAGS}
+XCFLAGS		  = ${INIT_CFLAGS} ${KNO_CFLAGS} ${LIBZIP_CFLAGS}
+XLDFLAGS		  = ${INIT_LDFLAGS} ${KNO_LDFLAGS} ${LIBZIP_LDFLAGS}
 MKSO		  = $(CC) -shared $(LDFLAGS) $(LIBS)
 MSG		  = echo
 SYSINSTALL        = /usr/bin/install -c
@@ -56,10 +56,10 @@ default build:
 libzip-build libzip-install:
 	${DIRINSTALL} $@
 
-libzip/.git:
+libzip/CMakeLists.txt:
 	git submodule init
 	git submodule update
-libzip-build/Makefile: libzip/.git libzip-build libzip-install
+libzip-build/Makefile: libzip/CMakeLists.txt libzip-build libzip-install
 	cd libzip-build; cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
 	      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	      -DBUILD_SHARED_LIBS=off \
@@ -67,13 +67,13 @@ libzip-build/Makefile: libzip/.git libzip-build libzip-install
 	      ../libzip
 
 ziptools.o: ziptools.c makefile ${STATICLIBS}
-	$(CC) $(CFLAGS) -D_FILEINFO="\"$(shell u8_fileinfo ./$< $(dirname $(pwd))/)\"" -o $@ -c $<
+	$(CC) $(XCFLAGS) -D_FILEINFO="\"$(shell u8_fileinfo ./$< $(dirname $(pwd))/)\"" -o $@ -c $<
 	@$(MSG) CC "(ZIPTOOLS)" $@
 ziptools.so: ziptools.o makefile ${STATICLIBS}
 	 $(MKSO) -o $@ ziptools.o -Wl,-soname=$(@F).${FULL_VERSION} \
 	          -Wl,--allow-multiple-definition \
 	          -Wl,--whole-archive ${STATICLIBS} -Wl,--no-whole-archive \
-			${LDFLAGS}
+			${XLDFLAGS}
 	 @$(MSG) MKSO "(ZIPTOOLS)" $@
 
 ziptools.dylib: ziptools.o
