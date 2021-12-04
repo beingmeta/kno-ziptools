@@ -1,6 +1,8 @@
+# Edit to adapt
+PKGNAME	          = ziptools
+LIBNAME	          = ziptools
 KNOCONFIG         = knoconfig
 KNOBUILD          = knobuild
-LIBZIPINSTALL     = libzip-install
 
 prefix		::= $(shell ${KNOCONFIG} prefix)
 libsuffix	::= $(shell ${KNOCONFIG} libsuffix)
@@ -9,8 +11,8 @@ INIT_LDFAGS     ::= ${LDFLAGS} -fPIC
 KNO_CFLAGS	::= -I. -fPIC $(shell ${KNOCONFIG} cflags)
 KNO_LDFLAGS	::= -fPIC $(shell ${KNOCONFIG} ldflags)
 KNO_LIBS	::= $(shell ${KNOCONFIG} libs)
-LIBZIP_CFLAGS   ::= $(shell INSTALLROOT=${LIBZIPINSTALL} ./etc/pkc --static --cflags libzip)
-LIBZIP_LDFLAGS  ::= $(shell INSTALLROOT=${LIBZIPINSTALL} ./etc/pkc --static --libs libzip)
+LIBZIP_CFLAGS   ::= $(shell INSTALLROOT=libzip-install ./etc/pkc --static --cflags libzip)
+LIBZIP_LDFLAGS  ::= $(shell INSTALLROOT=libzip-install ./etc/pkc --static --libs libzip)
 CMODULES	::= $(DESTDIR)$(shell ${KNOCONFIG} cmodules)
 INSTALLMODULES	::= $(DESTDIR)$(shell ${KNOCONFIG} installed_modules)
 LIBS		::= $(shell ${KNOCONFIG} libs)
@@ -25,8 +27,6 @@ FULL_VERSION    ::= ${KNO_MAJOR}.${KNO_MINOR}.${PKG_VERSION}
 PATCHLEVEL      ::= $(shell u8_gitpatchcount ./etc/knomod_version)
 PATCH_VERSION   ::= ${FULL_VERSION}-${PATCHLEVEL}
 
-PKG_NAME	::= ziptools
-DPKG_NAME	::= ${PKG_NAME}_${PATCH_VERSION}
 SUDO            ::= $(shell which sudo)
 XCFLAGS		  = ${INIT_CFLAGS} ${KNO_CFLAGS} ${LIBZIP_CFLAGS}
 XLDFLAGS		  = ${INIT_LDFLAGS} ${KNO_LDFLAGS} ${LIBZIP_LDFLAGS}
@@ -47,7 +47,7 @@ APKREPO         ::= $(shell ${KNOBUILD} getbuildopt APKREPO /srv/repo/kno/apk)
 APK_ARCH_DIR      = ${APKREPO}/staging/${ARCH}
 RPMDIR		  = dist
 
-STATICLIBS=${LIBZIPINSTALL}/lib/libzip.a
+STATICLIBS=libzip-install/lib/libzip.a
 
 default build:
 	make ${STATICLIBS}
@@ -56,15 +56,15 @@ default build:
 libzip-build libzip-install:
 	${DIRINSTALL} $@
 
-libzip/CMakeLists.txt:
+libzip-source/CMakeLists.txt:
 	git submodule init
 	git submodule update
-libzip-build/Makefile: libzip/CMakeLists.txt libzip-build libzip-install
+libzip-build/Makefile: libzip-source/CMakeLists.txt libzip-build libzip-install
 	cd libzip-build; cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
 	      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	      -DBUILD_SHARED_LIBS=off \
 	      -DCMAKE_INSTALL_PREFIX=../libzip-install \
-	      ../libzip
+	      ../libzip-source
 
 ziptools.o: ziptools.c makefile ${STATICLIBS}
 	$(CC) $(XCFLAGS) -D_FILEINFO="\"$(shell u8_fileinfo ./$< $(dirname $(pwd))/)\"" -o $@ -c $<
@@ -102,7 +102,7 @@ ${CMODULES}:
 install: install-cmodule install-scheme
 
 install-cmodule: build ${CMODULES}
-	${SUDO} u8_install_shared ${PKG_NAME}.${libsuffix} ${CMODULES} ${FULL_VERSION} "${SYSINSTALL}"
+	${SUDO} u8_install_shared ${LIBNAME}.${libsuffix} ${CMODULES} ${FULL_VERSION} "${SYSINSTALL}"
 
 install-scheme:
 	${SUDO} install -D scheme/gpath/ziptools.scm ${INSTALLMODULES}/gpath/ziptools.scm

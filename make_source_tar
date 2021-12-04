@@ -9,6 +9,6 @@ u8_gitversion etc/knomod_version > VERSION
 u8_gitversion etc/knomod_version -full > FULL_VERSION
 u8_gitbranch > BRANCH
 tar -rf ${TARGET} VERSION BASE_VERSION FULL_VERSION BRANCH
-("cd" libzip; git archive --prefix=libzip/ -o ../libzip.tar HEAD);
+("cd" libzip-source; git archive --prefix=libzip-source/ -o ../libzip.tar HEAD);
 tar --concatenate --file=${TARGET} libzip.tar
 rm libzip.tar

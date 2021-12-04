@@ -1,4 +1,4 @@
 [submodule "libzip"]
-	path = libzip
+	path = libzip-source
 	url = git@github.com:beingmeta/libzip.git
 	branch = release
