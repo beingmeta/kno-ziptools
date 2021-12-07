@@ -47,32 +47,16 @@ APKREPO         ::= $(shell ${KNOBUILD} getbuildopt APKREPO /srv/repo/kno/apk)
 APK_ARCH_DIR      = ${APKREPO}/staging/${ARCH}
 RPMDIR		  = dist
 
-STATICLIBS=libzip-install/lib/libzip.a
-
 default build:
-	make ${STATICLIBS}
 	make ziptools.${libsuffix}
 
-libzip-build libzip-install:
-	${DIRINSTALL} $@
-
-libzip-source/CMakeLists.txt:
-	git submodule init
-	git submodule update
-libzip-build/Makefile: libzip-source/CMakeLists.txt libzip-build libzip-install
-	cd libzip-build; cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
-	      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-	      -DBUILD_SHARED_LIBS=off \
-	      -DCMAKE_INSTALL_PREFIX=../libzip-install \
-	      ../libzip-source
-
-ziptools.o: ziptools.c makefile ${STATICLIBS}
+ziptools.o: ziptools.c makefile libzip.a
 	$(CC) $(XCFLAGS) -D_FILEINFO="\"$(shell u8_fileinfo ./$< $(dirname $(pwd))/)\"" -o $@ -c $<
 	@$(MSG) CC "(ZIPTOOLS)" $@
-ziptools.so: ziptools.o makefile ${STATICLIBS}
+ziptools.so: ziptools.o makefile
 	 $(MKSO) -o $@ ziptools.o -Wl,-soname=$(@F).${FULL_VERSION} \
 	          -Wl,--allow-multiple-definition \
-	          -Wl,--whole-archive ${STATICLIBS} -Wl,--no-whole-archive \
+	          -Wl,--whole-archive libzip.a -Wl,--no-whole-archive \
 			${XLDFLAGS}
 	 @$(MSG) MKSO "(ZIPTOOLS)" $@
 
@@ -82,19 +66,6 @@ ziptools.dylib: ziptools.o
 		$(DYLIB_FLAGS) $(LIBZIP_LDFLAGS) \
 		-o $@ ziptools.o 
 	@$(MSG) MACLIBTOOL "(ZIPTOOLS)" $@
-
-libzip-install/lib/libzip.a: libzip-build/Makefile libzip-install
-	make -C libzip-build install
-	if test -d libzip-install/lib; then \
-	  echo > /dev/null; \
-	elif test -d libzip-install/lib64; then \
-	  ln -sf lib64 libzip-install/lib; \
-	else echo "No install libdir"; \
-	fi
-
-staticlibs: ${STATICLIBS}
-
-ziptools.so ziptools.dylib: staticlibs
 
 ${CMODULES}:
 	@install -d ${CMODULES}
@@ -118,6 +89,17 @@ deep-fresh: deep-clean
 
 gitup gitup-trunk:
 	git checkout trunk && git pull
+
+# Building libzip.a
+
+libzip-source/THANKS:
+	git submodule init
+	git submodule update
+
+libzip.a: libzip-source/THANKS
+	./build_libzip $@
+
+.PRECIOUS: libzip.a
 
 # Alpine packaging
 

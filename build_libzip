@@ -1,0 +1,29 @@
+#!/bin/sh
+TARGET_FILE=$1
+INSTALL_TARGET=$(pwd)/libzip-install
+echo "build_libzip: Building libzip, installing to ${INSTALL_TARGET}, to get $TARGET_FILE";
+# Populate the build directory
+if [ ! -d libzip-build ]; then mkdir libzip-build; fi
+if [ ! -d libzip-install ]; then mkdir libzip-install; fi
+unset MAKEFLAGS
+(cd libzip-build; cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
+      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+      -DCMAKE_INSTALL_PREFIX=${INSTALL_TARGET} \
+      -DBUILD_SHARED_LIBS=off \
+      ../libzip-source;
+ echo cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
+      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+      -DCMAKE_INSTALL_PREFIX=${INSTALL_TARGET} \
+      -DBUILD_SHARED_LIBS=off \
+      ../libzip-source)
+# Do a build and install
+make -C libzip-build install
+# Copy the library
+if test -f libzip-install/lib/libzip.a; then
+    echo "build_libzip: Copying libzip-install/lib/libzip.a to" ${TARGET_FILE};
+    cp libzip-install/lib/libzip.a ${TARGET_FILE};
+elif test -f libzip-install/lib64/libzip.a; then
+    echo "build_libzip: Copying libzip-install/lib64/libzip.a to" ${TARGET_FILE}
+    cp libzip-install/lib64/libzip.a ${TARGET_FILE};
+else echo "No libzip generated";
+fi;	
