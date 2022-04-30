@@ -63,7 +63,7 @@ ziptools.so: ziptools.o makefile
 ziptools.dylib: ziptools.o
 	@$(MACLIBTOOL) -install_name \
 		`basename $(@F) .dylib`.${KNO_MAJOR}.dylib \
-		$(DYLIB_FLAGS) $(LIBZIP_LDFLAGS) \
+		$(XLDFLAGS) $(DYLIB_FLAGS) $(LIBZIP_LDFLAGS) \
 		-o $@ ziptools.o 
 	@$(MSG) MACLIBTOOL "(ZIPTOOLS)" $@
 
